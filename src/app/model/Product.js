@@ -12,7 +12,7 @@ const Product = new Schema({
     image: {
         type: [String],
         required: true,
-        default: ["https://cdn3d.iconscout.com/3d/premium/thumb/product-3d-icon-png-download-9049202.png"]
+        default: ["https://cdn3di.conscout.com/3d/premium/thumb/product-3d-icon-png-download-9049202.png"]
     },
     categoryId:{
         type: mongoose.Schema.Types.ObjectId,
