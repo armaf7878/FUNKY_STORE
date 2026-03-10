@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const adminController = require('../controller/AdminController');
-const {verifyTokenAndAdmin} = require('../middleware/auth');
+const adminController = require('../app/controller/AdminController');
+const middleware = require('../app/middleware/VerifiedAccount');
 
-router.use(verifyTokenAndAdmin);
+const multer = require('multer');
+const storage = multer.memoryStorage(); 
+const upload = multer({ storage });
+
+router.use(middleware.verifyTokenAndAdmin);
 
 
 router.get('/dashboard', adminController.getDashboard);
@@ -26,7 +30,7 @@ router.delete('/orders/:id', adminController.deleteOrder);
 router.get('/products', adminController.getAllProducts);
 router.get('/products/low-stock', adminController.getLowStockProducts);
 router.get('/products/:id', adminController.getProductDetail);
-router.put('/products/:id', adminController.updateProduct);
+router.put('/products/:id', upload.single('image'), adminController.updateProduct);
 router.put('/product-variants/:id', adminController.updateProductVariant);
 
 

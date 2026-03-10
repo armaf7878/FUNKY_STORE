@@ -5,7 +5,7 @@ const Order = require('../model/Order');
 const OrderDetail = require('../model/OrderDetail');
 const Category = require('../model/Category');
 const bcrypt = require('bcryptjs');
-
+const imagekit = require('../../config/imagekit');
 class AdminController {
     
     //[GET] - /api/admin/dashboard
@@ -503,36 +503,64 @@ class AdminController {
         }
     }
     
-    //[PUT] - /api/admin/products/:id
+    // [PUT] /api/admin/products/:id
     async updateProduct(req, res) {
+
         try {
-            const {product_Name, description, image, categoryId} = req.body;
+
+            const {product_Name, description, categoryId} = req.body;
+
             const updateData = {};
-            
-            if (product_Name) updateData.product_Name = product_Name;
-            if (description) updateData.description = description;
-            if (image) updateData.image = image;
-            if (categoryId) updateData.categoryId = categoryId;
-            
+
+            if(product_Name) updateData.product_Name = product_Name;
+            if(description) updateData.description = description;
+            if(categoryId) updateData.categoryId = categoryId;
+
+            let imageUrl = null;
+
+            // upload image
+            if(req.file){
+
+                const uploadedImage = await imagekit.upload({
+
+                    file: req.file.buffer.toString("base64"),
+                    fileName: req.file.originalname
+
+                });
+
+                imageUrl = uploadedImage.url;
+
+                updateData.image = [imageUrl];
+            }
+
             const product = await Product.findByIdAndUpdate(
                 req.params.id,
                 updateData,
-                {new: true, runValidators: true}
-            ).populate('categoryId', 'Cate_Name');
-            
-            if (!product) {
-                return res.status(404).json({success: false, message: 'Product not found'});
+                {new:true, runValidators:true}
+            ).populate('categoryId','Cate_Name');
+
+            if(!product){
+                return res.status(404).json({
+                    success:false,
+                    message:"Product not found"
+                });
             }
-            
+
             res.json({
-                success: true, 
-                message: 'Product updated successfully',
-                data: product
+                success:true,
+                message:"Product updated successfully",
+                data:product
             });
-            
-        } catch (err) {
-            res.status(500).json({success: false, error: err.message});
+
+        } catch(err){
+
+            res.status(500).json({
+                success:false,
+                error:err.message
+            });
+
         }
+
     }
     
     //[GET] - /api/admin/products/low-stock

@@ -33,12 +33,13 @@ class UserController{
             res.status(400).json("Missing Password !");
         }
         User.findOne({email: req.body.email})
-        .then((user) => {
+        .then(async(user) => {
             if(!user){
                 res.status(404).json("User Invalid !");
             }
             else{
-                const validPassword = bcrypt.compare(req.body.password, user.password)
+                const validPassword = await bcrypt.compare(req.body.password, user.password)
+                console.log(validPassword)
                 if(validPassword){
                     const accessToken = jwt.sign({
                         id: user._id,
@@ -47,7 +48,6 @@ class UserController{
                         process.env.JWT_ACCESS_KEY,
                         {expiresIn: "2h"}
                     );
-
 
                     res.status(200).json({data: accessToken});
                 }else{

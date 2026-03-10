@@ -11,6 +11,10 @@ const Order = new Schema({
         type: String,
         required: true
     },
+    order_phone:{
+        type: String,
+        required: true
+    },
     total_amount:{
         type: Number,
         required: true
